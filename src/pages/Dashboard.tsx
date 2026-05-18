@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Scorecard } from '../lib/supabase';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Activity, Trophy, Plus } from 'lucide-react';
+import { Activity, Trophy, Plus, Trash2, Edit2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { Link } from 'react-router-dom';
 
@@ -34,6 +34,21 @@ export function Dashboard() {
       setScorecards(data);
     }
     setLoading(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this round?')) return;
+    
+    const { error } = await supabase
+      .from('scorecards')
+      .delete()
+      .eq('id', id);
+      
+    if (!error) {
+      setScorecards(scorecards.filter(s => s.id !== id));
+    } else {
+      alert('Failed to delete round.');
+    }
   };
 
   const chartData = scorecards.map(s => ({
@@ -123,6 +138,7 @@ export function Dashboard() {
                     <th style={{ padding: '0.75rem 0', color: 'var(--text-muted)', fontWeight: 500 }}>Date</th>
                     <th style={{ padding: '0.75rem 0', color: 'var(--text-muted)', fontWeight: 500 }}>Course</th>
                     <th style={{ padding: '0.75rem 0', color: 'var(--text-muted)', fontWeight: 500 }}>Score</th>
+                    <th style={{ padding: '0.75rem 0', textAlign: 'right', color: 'var(--text-muted)', fontWeight: 500 }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -131,6 +147,24 @@ export function Dashboard() {
                       <td style={{ padding: '1rem 0' }}>{format(parseISO(round.played_date), 'MMM d, yyyy')}</td>
                       <td style={{ padding: '1rem 0', fontWeight: 500, color: 'var(--text-main)' }}>{round.courses?.name}</td>
                       <td style={{ padding: '1rem 0', fontWeight: 600, color: 'var(--primary)' }}>{round.total_score}</td>
+                      <td style={{ padding: '1rem 0', textAlign: 'right' }}>
+                        <Link 
+                          to={`/round/${round.id}`} 
+                          className="btn btn-secondary" 
+                          style={{ padding: '0.5rem', marginRight: '0.5rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                          title="Resume / Edit Round"
+                        >
+                          <Edit2 size={16} />
+                        </Link>
+                        <button 
+                          onClick={() => handleDelete(round.id)}
+                          className="btn"
+                          style={{ padding: '0.5rem', backgroundColor: '#fee2e2', color: '#ef4444', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                          title="Delete Round"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
