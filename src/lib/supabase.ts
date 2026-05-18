@@ -10,6 +10,9 @@ export type Course = {
   name: string;
   location: string;
   county: string;
+  holes_count: number;
+  par_scores: number[];
+  handicaps: number[];
   created_at: string;
 };
 
@@ -18,6 +21,7 @@ export type Scorecard = {
   user_id: string;
   course_id: string;
   total_score: number;
+  hole_scores: Record<string, number>;
   played_date: string;
   created_at: string;
   courses?: Course; // Joined table data

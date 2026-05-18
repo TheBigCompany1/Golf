@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Scorecard } from '../lib/supabase';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Activity, Trophy } from 'lucide-react';
+import { Activity, Trophy, Plus } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 export function Dashboard() {
   const [scorecards, setScorecards] = useState<Scorecard[]>([]);
@@ -49,6 +50,9 @@ export function Dashboard() {
     <div className="container main-content">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h1>Performance Dashboard</h1>
+        <Link to="/courses" className="btn btn-primary">
+          <Plus size={16} /> Add Round
+        </Link>
       </div>
 
       {loading ? (

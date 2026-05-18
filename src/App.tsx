@@ -5,6 +5,7 @@ import { Header } from './components/Header';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { CourseDirectory } from './pages/CourseDirectory';
+import { LiveRound } from './pages/LiveRound';
 
 function App() {
   const [session, setSession] = useState<any>(null);
@@ -44,6 +45,10 @@ function App() {
         <Route 
           path="/courses" 
           element={session ? <CourseDirectory /> : <Navigate to="/login" />} 
+        />
+        <Route 
+          path="/round/:id" 
+          element={session ? <LiveRound /> : <Navigate to="/login" />} 
         />
       </Routes>
     </Router>

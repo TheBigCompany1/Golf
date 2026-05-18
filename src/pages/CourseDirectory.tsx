@@ -120,7 +120,7 @@ export function CourseDirectory() {
             >
               <X size={24} />
             </button>
-            <h2 style={{ marginBottom: '0.5rem' }}>Add Score</h2>
+            <h2 style={{ marginBottom: '0.5rem' }}>Add Round</h2>
             <p style={{ marginBottom: '1.5rem', color: 'var(--primary)', fontWeight: 500 }}>{selectedCourse.name}</p>
             
             <form onSubmit={handleScoreSubmit}>
@@ -135,8 +135,43 @@ export function CourseDirectory() {
                   required
                 />
               </div>
+
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', marginBottom: '1rem' }}>
+                <button 
+                  type="button" 
+                  className="btn btn-primary" 
+                  style={{ flex: 1 }}
+                  onClick={async () => {
+                    setSubmitting(true);
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                      const { data, error } = await supabase.from('scorecards').insert({
+                        user_id: user.id,
+                        course_id: selectedCourse.id,
+                        total_score: 0,
+                        hole_scores: {},
+                        played_date: playedDate
+                      }).select().single();
+                      
+                      if (!error && data) {
+                        navigate(`/round/${data.id}`);
+                      }
+                    }
+                    setSubmitting(false);
+                  }}
+                  disabled={submitting}
+                >
+                  Play Live (Hole-by-Hole)
+                </button>
+              </div>
+
+              <div style={{ position: 'relative', textAlign: 'center', margin: '1.5rem 0' }}>
+                <hr style={{ border: 'none', borderTop: '1px solid var(--border)' }} />
+                <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'var(--surface)', padding: '0 0.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>OR</span>
+              </div>
+
               <div className="form-group">
-                <label className="form-label" htmlFor="score">Total Score (18 holes)</label>
+                <label className="form-label" htmlFor="score">Quick Entry (Total Score)</label>
                 <input 
                   id="score"
                   type="number" 
@@ -145,25 +180,16 @@ export function CourseDirectory() {
                   value={score}
                   onChange={(e) => setScore(e.target.value)}
                   min="50" max="200"
-                  required
                 />
               </div>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  style={{ flex: 1 }}
-                  onClick={() => setSelectedCourse(null)}
-                >
-                  Cancel
-                </button>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <button 
                   type="submit" 
-                  className="btn btn-primary" 
+                  className="btn btn-secondary" 
                   style={{ flex: 1 }}
-                  disabled={submitting}
+                  disabled={submitting || !score}
                 >
-                  {submitting ? 'Saving...' : 'Save Score'}
+                  {submitting ? 'Saving...' : 'Save Total Score'}
                 </button>
               </div>
             </form>
